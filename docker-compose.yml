@@ -41,6 +41,7 @@ services:
     mem_limit: 512m
     ports:
       - "27017:27017"
+    command: mongod
     healthcheck:
       test: "mongo --eval 'db.stats().ok'"
       interval: 5s
@@ -50,11 +51,11 @@ services:
   mysql:
     image: mysql:5.7.32
     mem_limit: 512m
-    ports: 
+    ports:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=review_db
+      - MYSQL_DATABASE=review-db
       - MYSQL_USER=user
       - MYSQL_PASSWORD=pwd
     healthcheck:
