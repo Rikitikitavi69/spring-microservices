@@ -1,12 +1,18 @@
 package se.magnus.microservices.core.review.services;
 
-import java.util.ArrayList;
+import static java.util.logging.Level.FINE;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RestController;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import se.magnus.api.core.review.Review;
 import se.magnus.api.core.review.ReviewService;
 import se.magnus.api.exceptions.InvalidInputException;
@@ -22,12 +28,17 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository repository;
   private final ReviewMapper mapper;
   private final ServiceUtil serviceUtil;
+  private final Scheduler jdbcScheduler;
 
   @Autowired
-  public ReviewServiceImpl(ReviewRepository repository, ReviewMapper mapper, ServiceUtil serviceUtil) {
+  public ReviewServiceImpl(ReviewRepository repository, 
+                           ReviewMapper mapper, 
+                           ServiceUtil serviceUtil, 
+                           @Qualifier("jdbcScheduler") Scheduler jdbcScheduler) {
     this.repository = repository;
     this.mapper = mapper;
     this.serviceUtil = serviceUtil;
+    this.jdbcScheduler = jdbcScheduler;
   }
 
   @Override
@@ -45,16 +56,23 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<Review> getReviews(int productId) {
+  public Flux<Review> getReviews(int productId) {
     if (productId < 1) {
       throw new InvalidInputException("Invalid productId: " + productId);
     }
-  
+    LOG.info("Will get reviews for product with id={}", productId);
+    return Mono.fromCallable(() -> internalGetReviews(productId))
+      .flatMapMany(Flux::fromIterable)
+      .log(LOG.getName(), FINE)
+      .subscribeOn(jdbcScheduler);
+  }
+
+  private List<Review> internalGetReviews(int productId) {
     List<ReviewEntity> entityList = repository.findByProductId(productId);
     List<Review> list = mapper.entityListToApiList(entityList);
     list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
 
-    LOG.debug("getReviews: response size: {}", list.size());
+    LOG.debug("Response size: {}", list.size());
     return list;
   }
 

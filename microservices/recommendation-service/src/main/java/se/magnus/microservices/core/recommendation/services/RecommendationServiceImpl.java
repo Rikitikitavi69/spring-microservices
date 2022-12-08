@@ -1,5 +1,7 @@
 package se.magnus.microservices.core.recommendation.services;
 
+import static java.util.logging.Level.FINE;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -7,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.RestController;
+
+import reactor.core.publisher.Flux;
 import se.magnus.api.core.recommendation.Recommendation;
 import se.magnus.api.core.recommendation.RecommendationService;
 import se.magnus.api.exceptions.InvalidInputException;
@@ -45,23 +49,27 @@ public class RecommendationServiceImpl implements RecommendationService {
   }
 
   @Override
-  public List<Recommendation> getRecommendations(int productId) {
+  public Flux<Recommendation> getRecommendations(int productId) {
     if (productId < 1) {
       throw new InvalidInputException("Invalid productId: " + productId);
     }
-  
-    List<RecommendationEntity> entityList = repository.findByProductId(productId);
-    List<Recommendation> list = mapper.entityListToApiList(entityList);
-    list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
-
-    LOG.debug("getRecommendations: response size: {}", list.size());
-    return list;
+    LOG.info("Will get product info for id={}", productId);
+    return repository.findByProductId(productId)
+      .log(LOG.getName(), FINE)
+      .switchIfEmpty(null)
+      .map(e -> mapper.entityToApi(e))
+      .map(e -> setServiceAddress(e));
   }
 
   @Override
   public void deleteRecommendations(int productId) {
     LOG.debug("deleteRecommendations: tries to delete recommendations for the product with productId: {}", productId);
     repository.deleteAll(repository.findByProductId(productId));
+  }
+
+  private Recommendation setServiceAddress(Recommendation e) {
+    e.setServiceAddress(serviceUtil.getServiceAddress());
+    return e;
   }
   
 }
