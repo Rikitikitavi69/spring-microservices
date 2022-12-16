@@ -33,7 +33,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 }
 
-dependencyManagment {
+dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
