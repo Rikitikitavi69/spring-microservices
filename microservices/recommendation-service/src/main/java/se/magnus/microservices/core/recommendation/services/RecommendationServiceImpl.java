@@ -27,7 +27,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 	private final ServiceUtil serviceUtil;
 
 	@Autowired
-	public RecommendationServiceImpl(RecommendationRepository repository, 
+	public RecommendationServiceImpl(RecommendationRepository repository,
 									 RecommendationMapper mapper,
 									 ServiceUtil serviceUtil) {
 		this.repository = repository;
@@ -42,11 +42,14 @@ public class RecommendationServiceImpl implements RecommendationService {
 		}
 		RecommendationEntity entity = mapper.apiToEntity(body);
 		Mono<Recommendation> newEntity = repository.save(entity)
-												   .log(LOG.getName(), FINE)
-												   .onErrorMap(
-														DuplicateKeyException.class, 
-														ex -> new InvalidInputException())
-													.map(e -> mapper.entityToApi(e));
+				.log(LOG.getName(), FINE)
+				.onErrorMap(
+						DuplicateKeyException.class,
+						ex -> new InvalidInputException
+								("Duplicate key, Product Id: " + body.getProductId()
+										+ ", Recommendation Id:" + body.getRecommendationId()))
+				.map(e -> mapper.entityToApi(e));
+
 		return newEntity;
 	}
 
@@ -55,10 +58,9 @@ public class RecommendationServiceImpl implements RecommendationService {
 		if (productId < 1) {
 			throw new InvalidInputException("Invalid productId: " + productId);
 		}
-		LOG.info("Will get product info for id={}", productId);
+		LOG.info("Will get recommendations for product with id={}", productId);
 		return repository.findByProductId(productId)
 				.log(LOG.getName(), FINE)
-				.switchIfEmpty(null)
 				.map(e -> mapper.entityToApi(e))
 				.map(e -> setServiceAddress(e));
 	}

@@ -25,7 +25,7 @@ public class PersistenceTests extends MongoDbTestBase {
   
     @BeforeEach
     void setupDb() {
-      repository.deleteAll();
+      repository.deleteAll().block();
   
       RecommendationEntity entity = new RecommendationEntity(1, 2, "a", 3, "c");
       savedEntity = repository.save(entity).block();
