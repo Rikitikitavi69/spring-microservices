@@ -27,6 +27,10 @@ public class IsSameEvent extends TypeSafeMatcher<String> {
         this.expectedEvent = expectedEvent;
     }
 
+    public static Matcher<String> sameEventExceptCreatedAt(Event expectedEvent) {
+        return new IsSameEvent(expectedEvent);
+    }
+
     @Override
     protected boolean matchesSafely(String eventAsJson) {
 
@@ -51,10 +55,6 @@ public class IsSameEvent extends TypeSafeMatcher<String> {
         description.appendText("expected to look like " + expectedJson);
     }
 
-    public static Matcher<String> sameEventExceptCreatedAt(Event expectedEvent) {
-        return new IsSameEvent(expectedEvent);
-    }
-
     private Map getMapWithoutCreatedAt(Event event) {
         Map mapEvent = convertObjectToMap(event);
         mapEvent.remove("eventCreatedAt");
@@ -76,7 +76,8 @@ public class IsSameEvent extends TypeSafeMatcher<String> {
 
     private Map convertJsonStringToMap(String eventAsJson) {
         try {
-            return mapper.readValue(eventAsJson, new TypeReference<HashMap>(){});
+            return mapper.readValue(eventAsJson, new TypeReference<HashMap>() {
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

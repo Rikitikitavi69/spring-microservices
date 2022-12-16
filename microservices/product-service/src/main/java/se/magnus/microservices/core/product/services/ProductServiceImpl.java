@@ -1,13 +1,10 @@
 package se.magnus.microservices.core.product.services;
 
-import static java.util.logging.Level.FINE;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.RestController;
-
 import reactor.core.publisher.Mono;
 import se.magnus.api.core.product.Product;
 import se.magnus.api.core.product.ProductService;
@@ -16,6 +13,8 @@ import se.magnus.api.exceptions.NotFoundException;
 import se.magnus.microservices.core.product.persistence.ProductEntity;
 import se.magnus.microservices.core.product.persistence.ProductRepository;
 import se.magnus.util.http.ServiceUtil;
+
+import static java.util.logging.Level.FINE;
 
 @RestController
 public class ProductServiceImpl implements ProductService {
@@ -27,8 +26,8 @@ public class ProductServiceImpl implements ProductService {
     private final ServiceUtil serviceUtil;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository repository, 
-                              ProductMapper mapper, 
+    public ProductServiceImpl(ProductRepository repository,
+                              ProductMapper mapper,
                               ServiceUtil serviceUtil) {
         this.repository = repository;
         this.mapper = mapper;
@@ -69,9 +68,9 @@ public class ProductServiceImpl implements ProductService {
         }
         LOG.debug("deleteProduct: tries to delete an entity with productId: {}", productId);
         return repository.findByProductId(productId)
-                         .log(LOG.getName(), FINE)
-                         .map(e -> repository.delete(e))
-                         .flatMap(e -> e);
+                .log(LOG.getName(), FINE)
+                .map(e -> repository.delete(e))
+                .flatMap(e -> e);
     }
 
     private Product setServiceAddress(Product e) {

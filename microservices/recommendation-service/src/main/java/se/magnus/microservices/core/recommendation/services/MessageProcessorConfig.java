@@ -1,21 +1,20 @@
 package se.magnus.microservices.core.recommendation.services;
 
-import java.util.function.Consumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import se.magnus.api.core.recommendation.Recommendation;
 import se.magnus.api.core.recommendation.RecommendationService;
 import se.magnus.api.event.Event;
 import se.magnus.api.exceptions.EventProcessingException;
 
+import java.util.function.Consumer;
+
 @Configuration
 public class MessageProcessorConfig {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(MessageProcessorConfig.class);
 
     private final RecommendationService recommendationService;
@@ -48,5 +47,5 @@ public class MessageProcessorConfig {
             LOG.info("Message processing done!");
         };
     }
-    
+
 }

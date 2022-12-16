@@ -24,7 +24,6 @@ public class RecommendationServiceApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecommendationServiceApplication.class);
 
-
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(RecommendationServiceApplication.class, args);
 

@@ -45,6 +45,19 @@ public class ProductCompositeServiceApplication {
     @Value("${api.common.contact.email}")
     String apiContactEmail;
 
+    private final Integer threadPoolSize;
+    private final Integer taskQueueSize;
+    @Autowired
+    public ProductCompositeServiceApplication(
+            @Value("${app.threadPoolSize:10}") Integer threadPoolSize,
+            @Value("${app.taskQueueSize:100}") Integer taskQueueSize
+    ) {
+        this.threadPoolSize = threadPoolSize;
+        this.taskQueueSize = taskQueueSize;
+    }
+
+
+
     /**
      * Will exposed on $HOST:$PORT/swagger-ui.html
      *
@@ -67,18 +80,6 @@ public class ProductCompositeServiceApplication {
                 .externalDocs(new ExternalDocumentation()
                         .description(apiExternalDocDesc)
                         .url(apiExternalDocUrl));
-    }
-
-    private final Integer threadPoolSize;
-    private final Integer taskQueueSize;
-
-    @Autowired
-    public ProductCompositeServiceApplication(
-            @Value("${app.threadPoolSize:10}") Integer threadPoolSize,
-            @Value("${app.taskQueueSize:100}") Integer taskQueueSize
-    ) {
-        this.threadPoolSize = threadPoolSize;
-        this.taskQueueSize = taskQueueSize;
     }
 
     @Bean

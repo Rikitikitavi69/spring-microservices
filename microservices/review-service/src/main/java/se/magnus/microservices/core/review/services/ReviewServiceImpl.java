@@ -1,15 +1,11 @@
 package se.magnus.microservices.core.review.services;
 
-import static java.util.logging.Level.FINE;
-
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RestController;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -19,6 +15,10 @@ import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.microservices.core.review.persistence.ReviewEntity;
 import se.magnus.microservices.core.review.persistence.ReviewRepository;
 import se.magnus.util.http.ServiceUtil;
+
+import java.util.List;
+
+import static java.util.logging.Level.FINE;
 
 @RestController
 public class ReviewServiceImpl implements ReviewService {
@@ -32,9 +32,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
     public ReviewServiceImpl(ReviewRepository repository,
-            ReviewMapper mapper,
-            ServiceUtil serviceUtil,
-            @Qualifier("jdbcScheduler") Scheduler jdbcScheduler) {
+                             ReviewMapper mapper,
+                             ServiceUtil serviceUtil,
+                             @Qualifier("jdbcScheduler") Scheduler jdbcScheduler) {
         this.repository = repository;
         this.mapper = mapper;
         this.serviceUtil = serviceUtil;
@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidInputException("Invalid productId: " + body.getProductId());
         }
         return Mono.fromCallable(() -> internalCreateReview(body))
-                   .subscribeOn(jdbcScheduler);
+                .subscribeOn(jdbcScheduler);
     }
 
     private Review internalCreateReview(Review body) {
@@ -88,8 +88,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidInputException("Invalid productId: " + productId);
         }
         return Mono.fromRunnable(() -> internalDeleteReviews(productId))
-                   .subscribeOn(jdbcScheduler)
-                   .then();
+                .subscribeOn(jdbcScheduler)
+                .then();
     }
 
     public void internalDeleteReviews(int productId) {

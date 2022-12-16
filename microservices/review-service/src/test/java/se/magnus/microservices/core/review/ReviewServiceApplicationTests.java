@@ -1,14 +1,5 @@
 package se.magnus.microservices.core.review;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static se.magnus.api.event.Event.Type.CREATE;
-import static se.magnus.api.event.Event.Type.DELETE;
-
-import java.util.function.Consumer;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +11,16 @@ import se.magnus.api.core.review.Review;
 import se.magnus.api.event.Event;
 import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.microservices.core.review.persistence.ReviewRepository;
+
+import java.util.function.Consumer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static se.magnus.api.event.Event.Type.CREATE;
+import static se.magnus.api.event.Event.Type.DELETE;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ReviewServiceApplicationTests extends MySqlTestBase {
@@ -52,9 +53,9 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
         assertEquals(3, repository.findByProductId(productId).size());
 
         getAndVerifyReviewsByProductId(productId, OK)
-            .jsonPath("$.length()").isEqualTo(3)
-            .jsonPath("$[2].productId").isEqualTo(productId)
-            .jsonPath("$[2].reviewId").isEqualTo(3);
+                .jsonPath("$.length()").isEqualTo(3)
+                .jsonPath("$[2].productId").isEqualTo(productId)
+                .jsonPath("$[2].reviewId").isEqualTo(3);
     }
 
     @Test
@@ -69,9 +70,9 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
         assertEquals(1, repository.count());
 
         InvalidInputException thrown = assertThrows(
-            InvalidInputException.class, 
-            () -> sendCreateReviewEvent(productId, reviewId), 
-            "Expected a InvalidInputException here!");
+                InvalidInputException.class,
+                () -> sendCreateReviewEvent(productId, reviewId),
+                "Expected a InvalidInputException here!");
         assertEquals("Duplicate key, Product Id: 1, Review Id:1", thrown.getMessage());
 
         assertEquals(1, repository.count());
@@ -136,12 +137,12 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
     }
 
     private void sendCreateReviewEvent(int productId, int reviewId) {
-        Review review = new Review(productId, 
-                                   reviewId, 
-                                   "Author " + reviewId, 
-                                   "Subject " + reviewId,
-                                   "Content " + reviewId, 
-                                   "SA");
+        Review review = new Review(productId,
+                reviewId,
+                "Author " + reviewId,
+                "Subject " + reviewId,
+                "Content " + reviewId,
+                "SA");
         Event<Integer, Review> event = new Event(CREATE, productId, review);
         messageProcessor.accept(event);
     }

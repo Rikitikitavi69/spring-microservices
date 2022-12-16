@@ -15,7 +15,7 @@ import se.magnus.api.exceptions.EventProcessingException;
 
 @Configuration
 public class MessageProcessorConfig {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(MessageProcessorConfig.class);
 
     private final ProductService productService;
@@ -48,5 +48,5 @@ public class MessageProcessorConfig {
             LOG.info("Message processing done!");
         };
     }
-    
+
 }
