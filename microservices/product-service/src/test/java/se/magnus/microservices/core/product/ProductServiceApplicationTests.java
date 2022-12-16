@@ -5,22 +5,35 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static reactor.core.publisher.Mono.just;
+import static se.magnus.api.event.Event.Type.CREATE;
+import static se.magnus.api.event.Event.Type.DELETE;
+
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.magnus.api.core.product.Product;
+import se.magnus.api.event.Event;
+import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.microservices.core.product.persistence.ProductRepository;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ProductServiceApplicationTests extends MongoDbTestBase {
 
-  @Autowired private WebTestClient client;
+  @Autowired 
+  private WebTestClient client;
 
-  @Autowired private ProductRepository repository;
+  @Autowired 
+  private ProductRepository repository;
+
+  @Autowired
+  @Qualifier("messageProcessor")
+  private Consumer<Event<Integer, Product>> messageProcessor;
 
   @BeforeEach
   void setupDb() {
