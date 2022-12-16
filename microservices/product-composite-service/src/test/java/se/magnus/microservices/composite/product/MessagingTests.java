@@ -51,9 +51,9 @@ public class MessagingTests {
 
     @BeforeEach
     void setUp() {
-        purgeMessage("products");
-        purgeMessage("recommendations");
-        purgeMessage("reviews");
+        purgeMessages("products");
+        purgeMessages("recommendations");
+        purgeMessages("reviews");
     }
 
     @Test
@@ -61,25 +61,21 @@ public class MessagingTests {
         ProductAggregate composite = new ProductAggregate(1, "name", 1, null, null, null);
         postAndVerifyProduct(composite, ACCEPTED);
 
-        List<String> productMessages = getMessages("products");
-        List<String> recommendationMessages = getMessages("recommendations");
-        List<String> reviewMessages = getMessages("reviews");
+        final List<String> productMessages = getMessages("products");
+        final List<String> recommendationMessages = getMessages("recommendations");
+        final List<String> reviewMessages = getMessages("reviews");
 
         // Assert one expected new product event queued up
         assertEquals(1, productMessages.size());
 
-        Event<Integer, Product> expectedEvent = new Event(
-                CREATE,
-                composite.getProductId(),
-                new Product(composite.getProductId(), composite.getName(), composite.getWeight(), null)
-        );
+        Event<Integer, Product> expectedEvent =
+                new Event(CREATE, composite.getProductId(), new Product(composite.getProductId(), composite.getName(), composite.getWeight(), null));
         assertThat(productMessages.get(0), is(sameEventExceptCreatedAt(expectedEvent)));
 
         // Assert no recommendation and review events
         assertEquals(0, recommendationMessages.size());
         assertEquals(0, reviewMessages.size());
     }
-
 
     @Test
     void createCompositeProduct2() {
@@ -165,13 +161,12 @@ public class MessagingTests {
         assertThat(reviewMessages.get(0), is(sameEventExceptCreatedAt(expectedReviewEvent)));
     }
 
-    private void purgeMessage(String bindingName) {
+    private void purgeMessages(String bindingName) {
         getMessages(bindingName);
     }
 
     private List<String> getMessages(String bindingName) {
-        ArrayList<String> messages = new ArrayList<>();
-
+        List<String> messages = new ArrayList<>();
         boolean anyMoreMessages = true;
         while (anyMoreMessages) {
             Message<byte[]> message = getMessage(bindingName);
@@ -186,8 +181,10 @@ public class MessagingTests {
 
     private Message<byte[]> getMessage(String bindingName) {
         try {
-            return target.receive();
+            return target.receive(0, bindingName);
         } catch (NullPointerException npe) {
+            // If the messageQueues member variable in the target object contains no queues when the receive method is called, it will cause a NPE to be thrown.
+            // So we catch the NPE here and return null to indicate that no messages were found.
             LOG.error("getMessage() received a NPE with binding = {}", bindingName);
             return null;
         }
@@ -207,4 +204,5 @@ public class MessagingTests {
                 .exchange()
                 .expectStatus().isEqualTo(expectedStatus);
     }
+
 }
