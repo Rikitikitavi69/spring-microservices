@@ -82,10 +82,16 @@ spring.cloud.stream:
   bindings:
     products-out-0:
       destination: products
+      producer:
+        required-groups: auditGroup
     recommendations-out-0:
       destination: recommendations
+      producer:
+        required-groups: auditGroup
     reviews-out-0:
       destination: reviews
+      producer:
+        required-groups: auditGroup
 
 spring.cloud.stream.kafka.binder:
   brokers: 127.0.0.1
@@ -101,6 +107,9 @@ logging:
   level:
     root: INFO
     se.magnus: DEBUG
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 
 ---
 spring.config.activate.on-profile: docker
