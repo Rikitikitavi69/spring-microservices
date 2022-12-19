@@ -10,7 +10,7 @@ services:
       mongodb:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   product-p1:
     build: microservices/product-service
@@ -21,7 +21,7 @@ services:
       mongodb:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   recommendation:
     build: microservices/recommendation-service
@@ -32,7 +32,7 @@ services:
       mongodb:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   recommendation-p1:
     build: microservices/recommendation-service
@@ -43,7 +43,7 @@ services:
       mongodb:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   review:
     build: microservices/review-service
@@ -54,7 +54,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   review-p1:
     build: microservices/review-service
@@ -65,7 +65,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   product-composite:
     build: microservices/product-composite-service
@@ -76,7 +76,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,kafka
     depends_on:
       kafka:
-        condition: service_healthy
+        condition: service_started
 
   mongodb:
     image: mongo:4.4.2
