@@ -39,35 +39,25 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
+    private static final String productServiceUrl = "http://product";
+    private static final String recommendationServiceUrl = "http://recommencdation";
+    private static final String reviewServiceUrl = "http://review";
+
     private final WebClient webClient;
     private final ObjectMapper mapper;
     private final StreamBridge streamBridge;
     private final Scheduler publishEventScheduler;
 
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
-
     @Autowired
     public ProductCompositeIntegration(WebClient.Builder webClient,
                                        ObjectMapper mapper,
                                        StreamBridge streamBridge,
-                                       @Qualifier("publishEventScheduler") Scheduler publishEventScheduler,
-                                       @Value("${app.product-service.host}") String productServiceHost,
-                                       @Value("${app.product-service.port}") int productServicePort,
-                                       @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-                                       @Value("${app.recommendation-service.port}") int recommendationServicePort,
-                                       @Value("${app.review-service.host}") String reviewServiceHost,
-                                       @Value("${app.review-service.port}") int reviewServicePort) {
+                                       @Qualifier("publishEventScheduler") Scheduler publishEventScheduler) {
 
         this.webClient = webClient.build();
         this.mapper = mapper;
         this.streamBridge = streamBridge;
         this.publishEventScheduler = publishEventScheduler;
-
-        productServiceUrl = "http://" + productServiceHost + ":" + productServicePort;
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort;
-        reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort;
     }
 
     @Override
