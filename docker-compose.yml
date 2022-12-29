@@ -54,7 +54,7 @@ services:
       interval: 5s
       timeout: 2s
       retries: 60
-    
+
   mysql:
     image: mysql:5.7.32
     mem_limit: 512m
