@@ -52,3 +52,15 @@ spring init \
 product-composite-service
 
 cd ..
+
+spring init \
+--boot-version=2.5.2 \
+--build=gradle \
+--java-version=1.8 \
+--packaging=jar \
+--name=product-composite-service \
+--package-name=se.magnus.microservices.composite.product \
+--groupId=se.magnus.microservices.composite.product \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+product-composite-service
