@@ -77,6 +77,21 @@ spring.cloud.gateway.routes:
   filters:
   - SetPath=/501
 
+- id: oauth2-server
+  uri: lb://auth-server
+  predicates:
+  - Path=/oauth2/**
+
+- id: oauth2-login
+  uri: lb://auth-server
+  predicates:
+  - Path=/login/**
+
+- id: oauth2-error
+  uri: lb://auth-server
+  predicates:
+  - Path=/error/**
+
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
