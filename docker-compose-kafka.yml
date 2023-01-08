@@ -75,6 +75,8 @@ services:
     depends_on:
       kafka:
         condition: service_started
+      auth-server:
+        condition: service_healthy
 
   mongodb:
     image: mongo:4.4.2
@@ -139,6 +141,9 @@ services:
     mem_limit: 512m
     ports:
       - "8443:8443"
+    depends_on:
+      auth-server:
+        condition: service_healthy
 
   auth-server:
     environment:
