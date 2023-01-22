@@ -3,6 +3,7 @@ springdoc:
   api-docs.path: /openapi/v3/api-docs
   packagesToScan: se.magnus.microservices.composite.product
   pathsToMatch: /**
+  cache.disabled: true
 
   swagger-ui:
     oauth2-redirect-url: https://localhost:8443/webjars/swagger-ui/oauth2-redirect.html
@@ -128,6 +129,7 @@ logging:
   level:
     root: INFO
     se.magnus: DEBUG
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
 
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
