@@ -123,8 +123,8 @@ spring.rabbitmq:
   username: guest
   password: guest
 
-spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}:9999
-
+domain.name.from.auth0.website: dev-sgnppoy27ac25zkp.us.auth0.com
+spring.security.oauth2.resourceserver.jwt.issuer-uri: https://${domain.name.from.auth0.website}/
 logging:
   level:
     root: INFO
