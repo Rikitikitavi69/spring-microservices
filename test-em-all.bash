@@ -184,21 +184,30 @@ fi
 
 waitForService curl -k https://$HOST:$PORT/actuator/health
 
-export TENANT=dev-sgnppoy27ac25zkp.us.auth0.com
-export WRITER_CLIENT_ID=
-export WRITER_CLIENT_SECRET=
-ACCESS_TOKEN=$(curl -X POST https://$TENANT/oauth/token \
-  -d grant_type=client_credentials \
-  -d audience=https://localhost:8443/product-composite \
-  -d scope=product:read+product:write \
-  -d client_id=$WRITER_CLIENT_ID \
-  -d client_secret=$WRITER_CLIENT_SECRET -s | jq -r .access_token)
+#
+ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth2/token -d grant_type=client_credentials -s | jq .access_token -r)
+# export TENANT=dev-sgnppoy27ac25zkp.us.auth0.com
+# export WRITER_CLIENT_ID=
+# export WRITER_CLIENT_SECRET=
+# ACCESS_TOKEN=$(curl -X POST https://$TENANT/oauth/token \
+#   -d grant_type=client_credentials \
+#   -d audience=https://localhost:8443/product-composite \
+#   -d scope=product:read+product:write \
+#   -d client_id=$WRITER_CLIENT_ID \
+#   -d client_secret=$WRITER_CLIENT_SECRET -s | jq -r .access_token)
 echo ACCESS_TOKEN=$ACCESS_TOKEN
 AUTH="-H \"Authorization: Bearer $ACCESS_TOKEN\""
 
-# Verify access to Eureka and that all four microservices are registered in Eureka
+# Verify access to Eureka and that all microservices are registered in Eureka
 assertCurl 200 "curl -H "accept:application/json" -k https://u:p@$HOST:$PORT/eureka/api/apps -s"
 assertEqual 6 $(echo $RESPONSE | jq ".applications.application | length")
+
+# Verify access to the Config server and that its encrypt/decrypt endpoints work
+assertCurl 200 "curl -H "accept:application/json" -k https://dev-usr:dev-pwd@$HOST:$PORT/config/product/docker -s"
+TEST_VALUE="hello world"
+ENCRYPTED_VALUE=$(curl -k https://dev-usr:dev-pwd@$HOST:$PORT/config/encrypt --data-urlencode "$TEST_VALUE" -s)
+DECRYPTED_VALUE=$(curl -k https://dev-usr:dev-pwd@$HOST:$PORT/config/decrypt -d $ENCRYPTED_VALUE -s)
+assertEqual "$TEST_VALUE" "$DECRYPTED_VALUE"
 
 setupTestdata
 
@@ -238,14 +247,16 @@ assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
 assertCurl 401 "curl -k https://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS -s"
 
 # Verify that the reader - client with only read scope can call the read API but not delete API.
-export READER_CLIENT_ID=
-export READER_CLIENT_SECRET=
-READER_ACCESS_TOKEN=$(curl -X POST https://$TENANT/oauth/token \
-  -d grant_type=client_credentials \
-  -d audience=https://localhost:8443/product-composite \
-  -d scope=product:read \
-  -d client_id=$READER_CLIENT_ID \
-  -d client_secret=$READER_CLIENT_SECRET -s | jq -r .access_token)
+#
+ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth2/token -d grant_type=client_credentials -s | jq .access_token -r)
+# export READER_CLIENT_ID=
+# export READER_CLIENT_SECRET=
+# READER_ACCESS_TOKEN=$(curl -X POST https://$TENANT/oauth/token \
+#   -d grant_type=client_credentials \
+#   -d audience=https://localhost:8443/product-composite \
+#   -d scope=product:read \
+#   -d client_id=$READER_CLIENT_ID \
+#   -d client_secret=$READER_CLIENT_SECRET -s | jq -r .access_token)
 echo READER_ACCESS_TOKEN=$READER_ACCESS_TOKEN
 READER_AUTH="-H \"Authorization: Bearer $READER_ACCESS_TOKEN\""
 
@@ -254,7 +265,7 @@ assertCurl 403 "curl -X DELETE $READER_AUTH -k https://$HOST:$PORT/product-compo
 
 # Verify access to Swagger and OpenAPI URLs
 echo "Swagger/OpenAPI tests"
-assertCurl 307 "curl -ks  https://$HOST:$PORT/openapi/swagger-ui.html"
+assertCurl 302 "curl -ks  https://$HOST:$PORT/openapi/swagger-ui.html"
 assertCurl 200 "curl -ksL https://$HOST:$PORT/openapi/swagger-ui.html"
 assertCurl 200 "curl -ks  https://$HOST:$PORT/openapi/webjars/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config"
 assertCurl 200 "curl -ks  https://$HOST:$PORT/openapi/v3/api-docs"

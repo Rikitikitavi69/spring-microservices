@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.5.2'
     implementation 'org.springdoc:springdoc-openapi-common:1.5.2'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.cloud:spring-cloud-stream::test-binder'
     testImplementation 'io.projectreactor:reactor-test'
